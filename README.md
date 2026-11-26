@@ -117,4 +117,10 @@ La inteligencia artificial junto con Google Workspace actúan como el núcleo op
 ### Diseño inclusivo y accesibilidad
 PuestoYa fue diseñada bajo estándares internacionales de accesibilidad (**WCAG**) pensando en usuarios con poca experiencia digital o con alguna discapacidad:
 - **Interacción sin teclado:** Gracias a la integración nativa de reconocimiento y síntesis de voz en Android (`SpeechRecognizer` y `TextToSpeech`), personas con baja alfabetización digital o dificultades motrices pueden crear su perfil hablando y escuchar toda la información de la pantalla en voz alta.
-- **Alto contraste y tipografía legible:** La interfaz utiliza colores con alto contraste visual y botones amplios diseñados
+- **Alto contraste y tipografía legible:** La interfaz utiliza colores con alto contraste visual y botones amplios diseñados para dispositivos móviles, facilitando su uso a adultos mayores o personas con debilidad visual.
+- **Lenguaje natural:** Elimina los tecnicismos administrativos; tanto el trabajador como el vecino interactúan usando su forma cotidiana de hablar.
+
+### Impacto social y comunitario esperado
+- **Trabajo digno e ingreso justo (ODS 8):** Permite que trabajadores independientes profesionalicen su oficio con respaldo visual y documental (perfil verificado y CV en PDF), asegurando cobros justos y trato directo con sus clientes sin intermediarios.
+- **Inclusión laboral sin barreras (ODS 10):** Integra a personas históricamente excluidas del mercado laboral tradicional —como adultos mayores, personas con discapacidad, migrantes y cuidadores— al eliminar la brecha digital y de movilidad.
+- **Economía circular de barrio (ODS 11):** Al priorizar la cercanía geográfica dentro de la misma colonia, el dinero circula dentro de la comunidad local, se reducen los tiempos y costos de transporte y se fortalece la confianza y solidaridad entre vecinos.
