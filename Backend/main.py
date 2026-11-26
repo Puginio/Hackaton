@@ -23,12 +23,14 @@ app.add_middleware(
 client = genai.Client(
     api_key=os.environ.get("GEMINI_API_KEY"),
     http_options=types.HttpOptions(
-        timeout=30000,
+        timeout=15000,
         retry_options=types.HttpRetryOptions(attempts=1)
     )
 )
 
 WORKSPACE_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyfGyx9UYDGVCEEm5DcpjxLPoW6q1PxZG3WD7z-TPsC8B0rVW1wHCrtiftRmWCuUJHVAQ/exec"
+
+MODELOS_GEMINI = ["gemini-2.5-flash", "gemini-2.0-flash", "gemini-3.8-flash"]
 
 
 class PerfilLaboral(BaseModel):
@@ -43,40 +45,45 @@ class PerfilLaboral(BaseModel):
 
 
 def extraer_perfil_desde_texto(texto: str, telefono: str) -> dict:
-    """Extractor inteligente de respaldo si Gemini tiene saturación 503."""
-    texto_limpio = texto.strip()
+    """Extractor inteligente de respaldo solo si todos los modelos de Gemini fallan."""
+    texto_limpio = re.sub(r"\b(jajaja+|mmm+|este+|eh+|y listo)\b", "", texto, flags=re.IGNORECASE)
+    texto_limpio = re.sub(r"\s+", " ", texto_limpio).strip()
 
     # 1. Extraer nombre
     nombre = "Trabajador Local"
     m_nombre = re.search(
-        r"(?:mi nombre es|me llamo|soy)\s+(.+?)(?=\s+(?:soy|y\s+soy|y\s+estoy|y\s+vivo|y\s+trabajo|estoy|vivo|trabajo|del|de\s+la|en\s+la|en\s+el|en|por|cobro)\b|,|\.|$)",
+        r"(?:mi nombre es|me llamo|soy)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ\s]{2,35}?)(?=\s+(?:soy|y\s+soy|trabajo|tengo|del|de\s+la|en\s+la|en|por|cobro)\b|,|\.|$)",
         texto_limpio,
         re.IGNORECASE
     )
     if m_nombre:
         nombre = m_nombre.group(1).strip().title()
 
-    # 2. Extraer colonia o alcaldía
-    colonia = "Coyoacán"
+    # 2. Extraer colonia o alcaldía (evitando confundir "en esto" o "en sistemas")
+    colonia = "CDMX"
     m_colonia = re.search(
-        r"(?:alcald[ií]a|colonia|del|de la|en la|en el|en)\s+(.+?)(?=\s+(?:puedo|y\s+puedo|y\s+cobro|y\s+trabajo|trabajo|solo|por|cobro)\b|,|\.|$)",
+        r"(?:colonia|alcald[ií]a|soy de la|soy del|soy de|calle de|calle)\s+([A-ZÁÉÍÓÚÑa-záéíóúñ\s]{3,30}?)(?=\s+(?:ciudad|trabajo|puedo|solo|cobro|por|tengo)\b|,|\.|$)",
         texto_limpio,
         re.IGNORECASE
     )
     if m_colonia:
         colonia = m_colonia.group(1).strip().title()
 
-    # 3. Extraer tarifa
-    tarifa = "$250 - $400 MXN por servicio"
-    m_tarifa = re.search(r"\$?\s*(\d[\d,\.]*)\s*(?:pesos|mxn)?", texto_limpio, re.IGNORECASE)
+    # 3. Extraer tarifa (prioriza números con $, "pesos", "mxn" o después de "cobro"/"alrededor de")
+    tarifa = "$350 MXN por servicio"
+    m_tarifa = re.search(
+        r"(?:\$\s*(\d[\d,]*)|(\d[\d,]*)\s*(?:pesos|mxn)|(?:cobro|alrededor de|como)\s+\$?\s*(\d[\d,]*))",
+        texto_limpio,
+        re.IGNORECASE
+    )
     if m_tarifa:
-        monto = m_tarifa.group(1).replace(",", "")
+        monto = next(g for g in m_tarifa.groups() if g is not None).replace(",", "")
         tarifa = f"${monto} MXN por servicio"
 
     # 4. Extraer horario
     horario = "Lunes a sábado de 8:00 AM a 6:00 PM"
     m_horario = re.search(
-        r"((?:solo\s+)?(?:los\s+)?(?:domingos|s[aá]bados|fines de semana|lunes a viernes|lunes a s[aá]bado|todos los d[ií]as)[^,\.]*)",
+        r"((?:solo\s+)?(?:los\s+)?(?:fines de semana(?:\s+s[aá]bados y domingos)?|domingos|s[aá]bados|lunes a viernes|lunes a s[aá]bado))",
         texto_limpio,
         re.IGNORECASE
     )
@@ -95,7 +102,9 @@ def extraer_perfil_desde_texto(texto: str, telefono: str) -> dict:
         "cocin": "Cocina y Preparación de Alimentos",
         "costur": "Costura y Arreglos de Ropa",
         "mecánic": "Mecánica Automotriz",
-        "herrer": "Herrería y Soldadura"
+        "herrer": "Herrería y Soldadura",
+        "sistema": "Soporte Técnico y Sistemas",
+        "program": "Desarrollo y Soporte de Sistemas"
     }
     oficio = "Servicios Generales y Oficios Varios"
     for clave, titulo in oficios_map.items():
@@ -103,15 +112,24 @@ def extraer_perfil_desde_texto(texto: str, telefono: str) -> dict:
             oficio = titulo
             break
 
+    # 6. Detectar años de experiencia si los menciona
+    m_exp = re.search(r"(\d{1,2})\s*a[nñ]os", texto_limpio, re.IGNORECASE)
+    exp_texto = f" con {m_exp.group(1)} años de experiencia comprobada" if m_exp else " con amplia experiencia en el ramo"
+
+    descripcion_limpia = (
+        f"Profesional especializado en {oficio.lower()}{exp_texto}. "
+        f"Brinda atención confiable, puntual y de alta calidad en {colonia} y zonas cercanas ({horario.lower()})."
+    )
+
     return {
         "nombre": nombre,
         "oficio": oficio,
-        "descripcion_profesional": f"Especialista en {oficio.lower()} con atención en {colonia}. {texto_limpio.capitalize()}.",
-        "habilidades": [oficio.split(" ")[0], "Atención puntual", f"Cobertura en {colonia}"],
+        "descripcion_profesional": descripcion_limpia,
+        "habilidades": [oficio.split(" ")[0], "Diagnóstico y solución rápida", f"Atención en {colonia}"],
         "colonia": colonia,
         "horario": horario,
         "tarifa_justa_mxn": tarifa,
-        "mensaje_whatsapp": f"Hola, soy {nombre}, ofrezco servicios de {oficio} en {colonia}. Contáctame al {telefono}."
+        "mensaje_whatsapp": f"Hola, soy {nombre}, especialista en {oficio} en {colonia}. Contáctame al {telefono}."
     }
 
 
@@ -127,7 +145,6 @@ def procesar_trabajador(
     if transcripcion.lower() == "string":
         transcripcion = ""
 
-    # Prioriza transcribir el audio .wav si se sube archivo
     if audio and audio.filename:
         audio_bytes = audio.file.read()
         if audio_bytes:
@@ -148,7 +165,6 @@ def procesar_trabajador(
 
     print(f"    Texto listo para Gemini: '{transcripcion}'", flush=True)
 
-    # Preparar imagen en Base64 si el usuario subió foto
     foto_b64 = ""
     foto_mime = ""
     if foto and foto.filename:
@@ -158,27 +174,37 @@ def procesar_trabajador(
             foto_mime = foto.content_type or "image/jpeg"
             print(f"    Foto recibida ({len(foto_bytes)} bytes, {foto_mime})", flush=True)
 
-    prompt_texto = f"""Eres el motor de inclusión laboral de PuestoYa.
-    Analiza esta presentación de un trabajador: "{transcripcion}".
-    Extrae sus datos reales (nombre, oficio, colonia o alcaldía, horario y tarifa en MXN).
-    Redacta una descripción profesional digna y atractiva para su CV, 3 habilidades clave y un anuncio corto para WhatsApp."""
+    prompt_texto = f"""Eres el editor profesional de perfiles laborales de PuestoYa.
+    Un trabajador grabó esta nota de voz informal: "{transcripcion}".
+    
+    Instrucciones estrictas:
+    1. Extrae su nombre real, oficio, colonia/alcaldía/ciudad, horario y tarifa en MXN (ignora números de edad o bromas; toma el precio real que cobra por trabajo).
+    2. En 'descripcion_profesional', redacta un párrafo formal, digno y vendedor en tercera persona para su CV (elimina por completo risas como 'jajaja', muletillas como 'mmm', 'y listo', y nunca pegues la transcripción literal).
+    3. Genera 3 habilidades técnicas concretas de su oficio.
+    4. Redacta un mensaje corto y amable para WhatsApp."""
 
     print("--> [2/3] Estructurando perfil con Gemini...", flush=True)
-    try:
-        respuesta = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=prompt_texto,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                response_schema=PerfilLaboral,
-                temperature=0.3,
-                thinking_config=types.ThinkingConfig(thinking_budget=0)
+    perfil_json = None
+    for modelo in MODELOS_GEMINI:
+        try:
+            print(f"    Consultando {modelo}...", flush=True)
+            respuesta = client.models.generate_content(
+                model=modelo,
+                contents=prompt_texto,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=PerfilLaboral,
+                    temperature=0.2
+                )
             )
-        )
-        perfil_json = json.loads(respuesta.text)
-        print("    ¡Éxito con Gemini!", flush=True)
-    except Exception as err:
-        print(f"    Aviso Gemini ({err}), usando extractor local...", flush=True)
+            perfil_json = json.loads(respuesta.text)
+            print(f"    ¡Éxito con {modelo}!", flush=True)
+            break
+        except Exception as err:
+            print(f"    {modelo} no disponible ({err})", flush=True)
+
+    if not perfil_json:
+        print("    Usando extractor local de respaldo...", flush=True)
         perfil_json = extraer_perfil_desde_texto(transcripcion, telefono)
 
     perfil_json["telefono"] = telefono
@@ -230,16 +256,17 @@ def buscar_vecino(solicitud: str = Form(...)):
     """
 
     print("--> [2/2] Buscando coincidencias con Gemini...", flush=True)
-    try:
-        respuesta = client.models.generate_content(
-            model="gemini-3.8-flash",
-            contents=prompt_busqueda,
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json",
-                thinking_config=types.ThinkingConfig(thinking_budget=0)
+    for modelo in MODELOS_GEMINI:
+        try:
+            respuesta = client.models.generate_content(
+                model=modelo,
+                contents=prompt_busqueda,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
             )
-        )
-        return json.loads(respuesta.text)
-    except Exception as err:
-        print(f"ERROR Gemini búsqueda: {err}", flush=True)
-        return {"resultados": []}
+            return json.loads(respuesta.text)
+        except Exception as err:
+            print(f"    {modelo} búsqueda no disponible ({err})", flush=True)
+
+    return {"resultados": []}
