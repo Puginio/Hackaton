@@ -3,7 +3,7 @@
 **Equipo:** Los Nueces  
 **Campus:** Campus UVM Coyoacán  
 **Enlace en vivo:** [PENDIENTE: Agregar URL de despliegue en Vercel / Netlify]  
-**Repositorio:** [PENDIENTE: Agregar URL del repositorio en GitHub]  
+**Repositorio:** (https://github.com/Puginio/Hackaton)
 
 ---
 
