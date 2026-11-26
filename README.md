@@ -3,7 +3,7 @@
 **Equipo:** Los Nueces  
 **Integrantes:** Aguirre García Víctor Jesús, Vargas Morales Marco Alexis  
 **Campus:** Campus UVM Coyoacán  
-**Enlace en vivo:** [PENDIENTE: Agregar URL de despliegue en Vercel / Netlify]  
+**Enlace en vivo:** [PENDIENTE: Agregar URL de despliegue en Vercel / Netlify] 
 **Repositorio:** (https://github.com/Puginio/Hackaton)
 * **Problema a resolver:** Combatir la exclusión laboral en las ciudades causada por las barreras digitales (dificultad para elaborar un CV o usar plataformas complejas) y las barreras de movilidad (imposibilidad de realizar traslados largos) para ofrecer oficios de manera digna y sin intermediarios.
 * **Usuarios objetivo:** Adultos mayores, personas con discapacidad, migrantes, cuidadores y trabajadores esenciales de oficios locales, así como vecinos y comercios de su misma colonia que requieren servicios cercanos.
