@@ -1,9 +1,14 @@
 # PuestoYa
 
 **Equipo:** Los Nueces  
+**Integrantes:** Aguirre García Víctor Jesús, Vargas Morales Marco Alexis  
 **Campus:** Campus UVM Coyoacán  
 **Enlace en vivo:** [PENDIENTE: Agregar URL de despliegue en Vercel / Netlify]  
 **Repositorio:** (https://github.com/Puginio/Hackaton)
+* **Problema a resolver:** Combatir la exclusión laboral en las ciudades causada por las barreras digitales (dificultad para elaborar un CV o usar plataformas complejas) y las barreras de movilidad (imposibilidad de realizar traslados largos) para ofrecer oficios de manera digna y sin intermediarios.
+* **Usuarios objetivo:** Adultos mayores, personas con discapacidad, migrantes, cuidadores y trabajadores esenciales de oficios locales, así como vecinos y comercios de su misma colonia que requieren servicios cercanos.
+* **Alineación con los ODS 10 y 11:** Se atiende el **ODS 10 (Reducción de las desigualdades)** mediante una interfaz gratuita y accesible por voz que permite a poblaciones vulnerables monetizar sus habilidades en igualdad de condiciones; y se impulsa el **ODS 11 (Ciudades y comunidades sostenibles)** al fomentar la contratación hiperlocal dentro del mismo barrio, fortaleciendo el tejido comunitario y reduciendo traslados urbanos contaminantes.
+* **Integración de la IA (Gemini):** Se utiliza `gemini-2.5-flash` para convertir notas de voz y fotografías de trabajos manuales en perfiles profesionales verificados en formato JSON (con CV en PDF, tarifas justas sugeridas y tarjetas para WhatsApp), además de potenciar un buscador semántico hiperlocal que conecta en lenguaje natural las necesidades de los vecinos con los trabajadores más cercanos.
 
 ---
 
