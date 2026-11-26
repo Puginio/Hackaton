@@ -113,5 +113,6 @@ PuestoYa fue diseñada bajo estándares internacionales de accesibilidad web (**
 * **Lenguaje natural:** Elimina los tecnicismos administrativos; tanto el trabajador como el vecino interactúan usando su forma cotidiana de hablar.
 
 ### Impacto social y comunitario esperado
-* **Autonomía económica (ODS 10):** Permite que trabajadores vulnerables generen ingresos propios de manera digna, contando con un respaldo profesional (perfil verificado y CV en PDF) y referencias claras de cobro justo.
-* **Economía circular de barrio (ODS 11):** Al priorizar la cercanía geográfica dentro de la misma colonia, el dinero circula dentro de la comunidad local, se reducen los tiempos y costos de transporte público o privado, y se fomenta la confianza y solidaridad entre vecinos.
+* **Trabajo digno e ingreso justo (ODS 8):** Permite que trabajadores independientes profesionalicen su oficio con respaldo visual y documental (perfil verificado y CV en PDF), asegurando cobros justos y trato directo con sus clientes sin intermediarios.
+* **Inclusión laboral sin barreras (ODS 10):** Integra a personas históricamente excluidas del mercado laboral tradicional —como adultos mayores, personas con discapacidad, migrantes y cuidadores— al eliminar la brecha digital y de movilidad.
+* **Economía circular de barrio (ODS 11):** Al priorizar la cercanía geográfica dentro de la misma colonia, el dinero circula dentro de la comunidad local, se reducen los tiempos y costos de transporte y se fortalece la confianza y solidaridad entre vecinos.
