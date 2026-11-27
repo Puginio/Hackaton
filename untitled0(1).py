@@ -1,3 +1,7 @@
+https://colab.research.google.com/drive/10xjWIuJHVJuNenaLIMiyPHm_JZn8XGi1?usp=sharing
+
+
+
 # -*- coding: utf-8 -*-
 """Untitled0.ipynb
 
